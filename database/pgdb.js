@@ -1,7 +1,22 @@
 const humps = require('humps');
+const _ = require('lodash');
 const camelizeKeys = humps.camelizeKeys;
 
 module.exports = pgPool => {
+  const orderedFor = (rows, collection, field) {
+    const data = humps.camelizeKeys(rows);
+    const inGroupsOfField = _.groupBy(data, field);
+
+    return collection.map(element => {
+
+      const elementArray = inGroupsOfField[element];
+      if (elementArray) {
+        return elementArray[0];
+      }
+      return {};
+    });
+  }
+
   return {
     getUserById(userId) {
       return pgPool.query(`
